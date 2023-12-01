@@ -1,0 +1,148 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QSizePolicy
+from PyQt5.QtCore import Qt
+
+import statistics
+from scipy.stats import norm, t
+
+class ScientificCalculator(QWidget):
+    def _init_(self):
+        super()._init_()
+
+        self.initUI()
+
+    def initUI(self):
+        self.layout = QVBoxLayout()
+
+        self.label = QLabel('Enter a list of numbers separated by spaces:')
+        self.layout.addWidget(self.label)
+
+        self.line_edit = QLineEdit()
+        self.line_edit.setPlaceholderText('e.g., 1 2 3 4 5')
+        self.layout.addWidget(self.line_edit)
+
+        self.add_statistical_buttons()
+
+        self.result_label = QLabel('Result:')
+        self.result_label.setAlignment(Qt.AlignCenter)
+        self.result_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addWidget(self.result_label)
+
+        self.setLayout(self.layout)
+
+        self.setGeometry(300, 300, 400, 300)
+        self.setWindowTitle('Scientific Calculator')
+        self.show()
+
+    def add_statistical_buttons(self):
+        button_layout = QHBoxLayout()
+
+        buttons = [
+            QPushButton('Mean'),
+            QPushButton('Median'),
+            QPushButton('Mode'),
+            QPushButton('Variance'),
+            QPushButton('Standard Deviation'),
+            QPushButton('Confidence Interval'),
+            QPushButton('Standard Error of Mean'),
+            QPushButton('Z-Test'),
+            QPushButton('T-Test'),
+            QPushButton('P-Value'),
+            QPushButton('Skew'),
+            QPushButton('Kurtosis')
+        ]
+
+        for button in buttons:
+            button.clicked.connect(self.on_button_clicked)
+            button_layout.addWidget(button)
+
+        self.layout.addLayout(button_layout)
+
+    def on_button_clicked(self):
+        sender = self.sender()
+        button_text = sender.text()
+
+        if button_text == 'Mean':
+            self.calculate_mean()
+        elif button_text == 'Median':
+            self.calculate_median()
+        elif button_text == 'Mode':
+            self.calculate_mode()
+        elif button_text == 'Variance':
+            self.calculate_variance()
+        elif button_text == 'Standard Deviation':
+            self.calculate_std_dev()
+        elif button_text == 'Confidence Interval':
+            self.calculate_confidence_interval()
+        elif button_text == 'Standard Error of Mean':
+            self.calculate_standard_error()
+        elif button_text == 'Z-Test':
+            self.calculate_z_test()
+        elif button_text == 'T-Test':
+            self.calculate_t_test()
+        elif button_text == 'skew':
+            self.calculate_skew()
+        elif button_text == 'Kurtosis':
+            self.calculate_Kurtosis()
+    def calculate_mean(self):
+        numbers = self.get_numbers()
+        result = statistics.mean(numbers)
+        self.result_label.setText(f'Result: {result:.4f}')
+
+    def calculate_median(self):
+        numbers = self.get_numbers()
+        result = statistics.median(numbers)
+        self.result_label.setText(f'Result: {result}')
+
+    def calculate_mode(self):
+        numbers = self.get_numbers()
+        result = statistics.mode(numbers)
+        self.result_label.setText(f'Result: {result}')
+
+    def calculate_variance(self):
+        numbers = self.get_numbers()
+        result = statistics.variance(numbers)
+        self.result_label.setText(f'Result: {result:.4f}')
+
+    def calculate_std_dev(self):
+        numbers = self.get_numbers()
+        result = statistics.stdev(numbers)
+        self.result_label.setText(f'Result: {result:.4f}')
+
+    def calculate_confidence_interval(self):
+        numbers = self.get_numbers()
+        if numbers:
+            confidence_level = 0.95
+            mean_value = statistics.mean(numbers)
+            std_dev_value = statistics.stdev(numbers)
+            margin_of_error = norm.ppf((1 + confidence_level) / 2) * (std_dev_value / (len(numbers) ** 0.5))
+            lower_bound = mean_value - margin_of_error
+            upper_bound = mean_value + margin_of_error
+            self.result_label.setText(f'Confidence Interval: ({lower_bound:.4f}, {upper_bound:.4f})')
+        else:
+            self.result_label.setText('Error: Enter valid numbers')
+
+    def calculate_standard_error(self):
+        numbers = self.get_numbers()
+        if numbers:
+            std_error = statistics.stdev(numbers) / (len(numbers) ** 0.5)
+            self.result_label.setText(f'Standard Error of Mean: {std_error:.4f}')
+        else:
+            self.result_label.setText('Error: Enter valid numbers')
+
+    def calculate_z_test(self):
+        # Implement Z-test functionality here
+        pass
+
+    def calculate_t_test(self):
+        # Implement t-test functionality here
+        pass
+
+    def get_numbers(self):
+        text = self.line_edit.text()
+        return [float(num) for num in text.split() if num]
+
+if _name_ == '_main_':
+    app = QApplication(sys.argv)
+    ex = ScientificCalculator()
+    sys.exit(app.exec_())
